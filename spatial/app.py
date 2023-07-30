@@ -9,7 +9,7 @@ def load_data(file):
 
 # Function to convert DataFrame to GeoDataFrame
 def create_geo_dataframe(df):
-    geometry = gpd.points_from_xy(df['longitude'], df['latitude'])
+    geometry = gpd.points_from_xy(df['long'], df['lat'])
     gdf = gpd.GeoDataFrame(df, crs='EPSG:4326', geometry=geometry)
     return gdf
 
@@ -24,7 +24,7 @@ def main():
         gdf = create_geo_dataframe(df)
 
         # Rename the columns to match Streamlit's expectations
-        gdf.rename(columns={'latitude': 'LATITUDE', 'longitude': 'LONGITUDE'}, inplace=True)
+        gdf.rename(columns={'lat': 'LATITUDE', 'long': 'LONGITUDE'}, inplace=True)
 
         # Extract day and month from the onset date column
         gdf['onset'] = pd.to_datetime(gdf['onset'], format='%d/%m/%Y', dayfirst=True)
