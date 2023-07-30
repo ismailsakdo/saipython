@@ -30,6 +30,13 @@ def main():
         # Rename the columns to match Streamlit's expectations
         gdf = gdf.rename(columns={'lat': 'LATITUDE', 'long': 'LONGITUDE'})
 
+        # Extract month and day from the onset date column
+        gdf['onset'] = pd.to_datetime(gdf['onset'], format='%d/%m/%Y', dayfirst=True)
+        gdf['month'] = gdf['onset'].dt.month
+
+        # Drop the onset_date column as we have extracted month and day
+        gdf.drop(columns=['onset'], inplace=True)
+
         # Display the main map with point data
         st.subheader('Main Map')
         st.map(gdf)
@@ -41,7 +48,7 @@ def main():
         selected_distance = st.sidebar.slider('Select Distance', float(df['distance'].min()), float(df['distance'].max()), (float(df['distance'].min()), float(df['distance'].max())))
         selected_age = st.sidebar.slider('Select Age', int(df['age'].min()), int(df['age'].max()), (int(df['age'].min()), int(df['age'].max())))
         selected_city = st.sidebar.multiselect('Select City', df['city'].unique())
-        selected_day = st.sidebar.selectbox('Select Day', df['day'].unique())
+        selected_month = st.sidebar.slider('Select Month', 1, 12, (1, 12))
 
         # Filter data based on selected filters
         filtered_gdf = gdf[
@@ -50,7 +57,7 @@ def main():
             (gdf['distance'].between(selected_distance[0], selected_distance[1])) &
             (gdf['age'].between(selected_age[0], selected_age[1])) &
             (gdf['city'].isin(selected_city)) &
-            (gdf['day'] == selected_day)
+            (gdf['month'].between(selected_month[0], selected_month[1]))
         ]
 
         # Display the filtered data
@@ -65,3 +72,4 @@ def main():
 # Run the Streamlit app
 if __name__ == '__main__':
     main()
+
